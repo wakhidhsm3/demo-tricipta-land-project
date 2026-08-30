@@ -17,21 +17,30 @@ function SelectValue({ ...props }: React.ComponentProps<typeof SelectPrimitive.V
   return <SelectPrimitive.Value data-slot="select-value" {...props} />;
 }
 
+export interface SelectTriggerProps
+  extends React.ComponentProps<typeof SelectPrimitive.Trigger> {
+  icon?: React.ReactNode;
+}
+
 function SelectTrigger({
   className,
   children,
+  icon,
   ...props
-}: React.ComponentProps<typeof SelectPrimitive.Trigger>) {
+}: SelectTriggerProps) {
   return (
     <SelectPrimitive.Trigger
       data-slot="select-trigger"
       className={cn(
-        'flex h-11 w-full items-center justify-between gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-sm text-slate-800 shadow-2xs transition-all duration-200 hover:border-slate-300 focus:border-emerald-600 focus:outline-none focus:ring-3 focus:ring-emerald-700/15 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer select-none',
+        'flex h-11 w-full items-center justify-between gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-sm text-slate-800 shadow-2xs transition-all duration-200 hover:border-slate-300 focus:border-emerald-600 focus:outline-none focus:ring-3 focus:ring-emerald-700/15 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer select-none [&>span]:truncate text-left',
         className
       )}
       {...props}
     >
-      {children}
+      <div className="flex items-center gap-2 min-w-0 truncate">
+        {icon && <span className="text-slate-400 shrink-0 flex items-center">{icon}</span>}
+        {children}
+      </div>
       <SelectPrimitive.Icon asChild>
         <ChevronDown className="size-4 text-slate-400 shrink-0 transition-transform duration-200" />
       </SelectPrimitive.Icon>

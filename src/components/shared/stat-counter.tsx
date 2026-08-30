@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
+import { ANIMATION_DURATIONS } from '@/lib/config/ui.constants';
 
 export interface StatCounterProps {
   value: string;
@@ -30,24 +31,24 @@ export function parseStatValue(raw: string): {
 export function StatCounter({
   value,
   className = '',
-  durationMs = 2000,
+  durationMs = ANIMATION_DURATIONS.STAT_COUNTER_DEFAULT_MS,
 }: StatCounterProps) {
-  const [currentVal, setCurrentVal] = useState(0);
+  const { target, prefix, suffix } = parseStatValue(value);
+
+  const [currentVal, setCurrentVal] = useState(() => {
+    if (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      return target;
+    }
+    return 0;
+  });
   const ref = useRef<HTMLSpanElement>(null);
   const hasAnimated = useRef(false);
 
-  const { target, prefix, suffix } = parseStatValue(value);
-
   useEffect(() => {
     const el = ref.current;
-    if (!el) return;
+    if (!el || hasAnimated.current) return;
 
-    // Respect user's reduced motion
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    if (mediaQuery.matches) {
-      setCurrentVal(target);
-      return;
-    }
+    let animFrameId: number | null = null;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -64,13 +65,13 @@ export function StatCounter({
             setCurrentVal(val);
 
             if (progress < 1) {
-              requestAnimationFrame(step);
+              animFrameId = requestAnimationFrame(step);
             } else {
               setCurrentVal(target);
             }
           };
 
-          requestAnimationFrame(step);
+          animFrameId = requestAnimationFrame(step);
         }
       },
       { threshold: 0.2 }
@@ -80,6 +81,9 @@ export function StatCounter({
 
     return () => {
       observer.disconnect();
+      if (animFrameId !== null) {
+        cancelAnimationFrame(animFrameId);
+      }
     };
   }, [target, durationMs]);
 

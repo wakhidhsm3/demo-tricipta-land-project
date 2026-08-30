@@ -3,15 +3,44 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 
+type AnimateInVariant = 'fade-up' | 'fade-down' | 'fade-in' | 'scale-in' | 'slide-right' | 'slide-left';
+
 export interface AnimateInProps {
   children: React.ReactNode;
-  variant?: 'fade-up' | 'fade-down' | 'fade-in' | 'scale-in' | 'slide-right' | 'slide-left';
+  variant?: AnimateInVariant;
   delayMs?: number;
   durationMs?: number;
   className?: string;
   threshold?: number;
   once?: boolean;
 }
+
+const VARIANT_STYLES: Record<AnimateInVariant, { visible: string; hidden: string }> = {
+  'fade-up': {
+    visible: 'opacity-100 translate-y-0',
+    hidden: 'opacity-0 translate-y-8',
+  },
+  'fade-down': {
+    visible: 'opacity-100 translate-y-0',
+    hidden: 'opacity-0 -translate-y-8',
+  },
+  'fade-in': {
+    visible: 'opacity-100',
+    hidden: 'opacity-0',
+  },
+  'scale-in': {
+    visible: 'opacity-100 scale-100',
+    hidden: 'opacity-0 scale-95',
+  },
+  'slide-right': {
+    visible: 'opacity-100 translate-x-0',
+    hidden: 'opacity-0 -translate-x-8',
+  },
+  'slide-left': {
+    visible: 'opacity-100 translate-x-0',
+    hidden: 'opacity-0 translate-x-8',
+  },
+};
 
 export function AnimateIn({
   children,
@@ -22,19 +51,17 @@ export function AnimateIn({
   threshold = 0.1,
   once = true,
 }: AnimateInProps) {
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    }
+    return false;
+  });
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const el = ref.current;
-    if (!el) return;
-
-    // Respect user's reduced motion settings
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    if (mediaQuery.matches) {
-      setIsVisible(true);
-      return;
-    }
+    if (!el || isVisible) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -58,40 +85,10 @@ export function AnimateIn({
     return () => {
       observer.disconnect();
     };
-  }, [threshold, once]);
+  }, [threshold, once, isVisible]);
 
-  const getVariantStyles = () => {
-    switch (variant) {
-      case 'fade-up':
-        return isVisible
-          ? 'opacity-100 translate-y-0'
-          : 'opacity-0 translate-y-8';
-      case 'fade-down':
-        return isVisible
-          ? 'opacity-100 translate-y-0'
-          : 'opacity-0 -translate-y-8';
-      case 'fade-in':
-        return isVisible
-          ? 'opacity-100'
-          : 'opacity-0';
-      case 'scale-in':
-        return isVisible
-          ? 'opacity-100 scale-100'
-          : 'opacity-0 scale-95';
-      case 'slide-right':
-        return isVisible
-          ? 'opacity-100 translate-x-0'
-          : 'opacity-0 -translate-x-8';
-      case 'slide-left':
-        return isVisible
-          ? 'opacity-100 translate-x-0'
-          : 'opacity-0 translate-x-8';
-      default:
-        return isVisible
-          ? 'opacity-100 translate-y-0'
-          : 'opacity-0 translate-y-8';
-    }
-  };
+  const styleConfig = VARIANT_STYLES[variant] || VARIANT_STYLES['fade-up'];
+  const variantClass = isVisible ? styleConfig.visible : styleConfig.hidden;
 
   return (
     <div
@@ -103,7 +100,7 @@ export function AnimateIn({
       }}
       className={cn(
         'transition-all will-change-[transform,opacity]',
-        getVariantStyles(),
+        variantClass,
         className
       )}
     >
@@ -111,3 +108,4 @@ export function AnimateIn({
     </div>
   );
 }
+

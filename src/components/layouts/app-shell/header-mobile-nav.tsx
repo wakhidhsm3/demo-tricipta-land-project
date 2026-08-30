@@ -3,68 +3,43 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import {
-  Menu,
-  X,
-  Check,
-  Home,
-  Building2,
-  Compass,
-  BookOpen,
-  PhoneCall,
-} from 'lucide-react';
-import { NavigationItem } from '@/lib/types/company';
+import { Menu, X, Check } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { NAV_ICON_NAMES } from '@/lib/config/navigation.config';
+import { useEscapeKey, useBodyScrollLock } from '@/hooks';
+import { isActiveNavLink } from '@/lib/utils';
+import { NavIcon } from './nav-icon';
 
 export interface HeaderMobileNavProps {
-  navigation: NavigationItem[];
+  navigation: readonly { label: string; href: string }[];
 }
 
-const navIcons: Record<string, React.ReactNode> = {
-  '/': <Home className="size-4 shrink-0" />,
-  '/about': <Building2 className="size-4 shrink-0" />,
-  '/projects': <Compass className="size-4 shrink-0" />,
-  '/articles': <BookOpen className="size-4 shrink-0" />,
-  '/contact': <PhoneCall className="size-4 shrink-0" />,
-};
-
 export function HeaderMobileNav({ navigation }: HeaderMobileNavProps) {
-  const [isOpen, setIsOpen] = React.useState(false);
   const pathname = usePathname();
+  const [isOpen, setIsOpen] = React.useState(false);
 
-  // Close menu on route change
-  React.useEffect(() => {
-    setIsOpen(false);
-  }, [pathname]);
-
-  // Handle escape key
-  React.useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setIsOpen(false);
-    };
-    if (isOpen) {
-      window.addEventListener('keydown', handleKeyDown);
-    }
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [isOpen]);
+  // Handle escape key and lock body scroll when mobile drawer is active
+  useEscapeKey(() => setIsOpen(false), isOpen);
+  useBodyScrollLock(isOpen);
 
   return (
     <div className="md:hidden">
       {/* Hamburger / Close Toggle Button */}
-      <button
+      <Button
         type="button"
+        variant="outline"
+        size="icon"
         onClick={() => setIsOpen(!isOpen)}
-        className="rounded-xl p-2 text-slate-800 hover:bg-slate-100/90 border border-slate-200/90 transition-all cursor-pointer flex items-center justify-center shrink-0 active:scale-95"
+        className="rounded-xl size-10 text-slate-800 hover:bg-slate-100/90 border-slate-200/90 shrink-0"
         aria-label={isOpen ? 'Tutup Menu Navigasi' : 'Buka Menu Navigasi'}
         aria-expanded={isOpen}
       >
         {isOpen ? (
-          <X className="size-5.5 text-slate-900 transition-transform duration-150 rotate-90" />
+          <X className="size-5 text-slate-900 transition-transform duration-150 rotate-90" />
         ) : (
-          <Menu className="size-5.5 text-slate-900 transition-transform duration-150" />
+          <Menu className="size-5 text-slate-900 transition-transform duration-150" />
         )}
-      </button>
+      </Button>
 
       {/* Select Dropdown Popover */}
       {isOpen && (
@@ -81,10 +56,8 @@ export function HeaderMobileNav({ navigation }: HeaderMobileNavProps) {
             <div className="mx-auto max-w-7xl rounded-xl border border-slate-200 bg-white p-1.5 shadow-lg flex flex-col gap-0.5 overflow-hidden">
               <nav className="flex flex-col gap-0.5">
                 {navigation.map((item) => {
-                  const isActive =
-                    item.href === '/'
-                      ? pathname === '/'
-                      : pathname === item.href || pathname.startsWith(`${item.href}/`);
+                  const isActive = isActiveNavLink(pathname, item.href);
+                  const iconName = NAV_ICON_NAMES[item.href] || 'Home';
 
                   return (
                     <Link
@@ -105,7 +78,7 @@ export function HeaderMobileNav({ navigation }: HeaderMobileNavProps) {
                               : 'text-slate-400 group-hover:text-emerald-700 transition-colors'
                           }
                         >
-                          {navIcons[item.href] || <Home className="size-4 shrink-0" />}
+                          <NavIcon name={iconName} className="size-4 shrink-0" />
                         </span>
                         <span>{item.label}</span>
                       </div>

@@ -2,19 +2,31 @@
 
 import React, { useEffect, useState } from 'react';
 import { ArrowUp } from 'lucide-react';
-import { CompanyHeadOffice } from '@/lib/types/company';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { siteConfig } from '@/lib/config/site.config';
+import { SCROLL_THRESHOLDS } from '@/lib/config/ui.constants';
+import { openWhatsApp, buildGeneralInquiryMessage } from '@/lib/whatsapp';
 
 export interface WhatsAppFloatingButtonProps {
-  contactData: CompanyHeadOffice;
+  phone?: string;
 }
 
-export function WhatsAppFloatingButton({ contactData }: WhatsAppFloatingButtonProps) {
+export function WhatsAppFloatingButton({ phone = siteConfig.headOffice.whatsapp }: WhatsAppFloatingButtonProps) {
   const [showScrollTop, setShowScrollTop] = useState(false);
 
+
   useEffect(() => {
+    let ticking = false;
+
     const handleScroll = () => {
-      setShowScrollTop(window.scrollY > 280);
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          setShowScrollTop(window.scrollY > SCROLL_THRESHOLDS.FLOATING_WA_BUTTON);
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -31,28 +43,32 @@ export function WhatsAppFloatingButton({ contactData }: WhatsAppFloatingButtonPr
   };
 
   const handleWaClick = () => {
-    const waUrl = `https://wa.me/${contactData.whatsapp}?text=${encodeURIComponent(
-      'Halo TRICIPTA LAND, saya ingin bertanya mengenai proyek perumahan dan konsultasi hunian.'
-    )}`;
-    window.open(waUrl, '_blank');
+    openWhatsApp({
+      phone,
+      message: buildGeneralInquiryMessage(),
+    });
   };
+
+
 
   return (
     <aside aria-label="Floating Action Controls" className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 select-none">
-      {/* Scroll To Top Button (Rounded Rectangle matching Gambar 2) */}
-      <button
+      {/* Scroll To Top Button */}
+      <Button
         type="button"
+        variant="default"
+        size="icon"
         onClick={scrollToTop}
         aria-label="Scroll to top"
         className={cn(
-          'size-11 sm:size-12 rounded-xl bg-slate-900 hover:bg-black text-white flex items-center justify-center shadow-lg transition-all duration-300 cursor-pointer hover:-translate-y-0.5 active:translate-y-0 border border-white/10',
+          'size-11 sm:size-12 rounded-xl bg-slate-900 hover:bg-black text-white shadow-lg transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0 border border-white/10',
           showScrollTop
             ? 'opacity-100 scale-100 translate-y-0 pointer-events-auto'
             : 'opacity-0 scale-75 translate-y-2 pointer-events-none'
         )}
       >
         <ArrowUp className="size-5 text-white" />
-      </button>
+      </Button>
 
       {/* WhatsApp / Chat Support Floating Button (Circle matching Gambar 2) */}
       <div className="relative group">

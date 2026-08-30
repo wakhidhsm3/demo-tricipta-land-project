@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { ChevronLeft, ChevronRight, MoreHorizontal } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Button, ButtonProps } from '@/components/ui/button';
 
 function Pagination({ className, ...props }: React.ComponentProps<'nav'>) {
   return (
@@ -33,23 +34,25 @@ function PaginationItem({ className, ...props }: React.ComponentProps<'li'>) {
 
 type PaginationLinkProps = {
   isActive?: boolean;
-  size?: 'default' | 'sm' | 'lg' | 'icon';
-} & React.ComponentProps<'button'>;
+} & ButtonProps;
 
 function PaginationLink({
   className,
   isActive,
+  size = 'sm',
   ...props
 }: PaginationLinkProps) {
   return (
-    <button
+    <Button
       aria-current={isActive ? 'page' : undefined}
       data-slot="pagination-link"
       data-active={isActive}
+      variant={isActive ? 'default' : 'outline'}
+      size={size}
       className={cn(
-        'inline-flex size-9 sm:size-10 items-center justify-center rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 cursor-pointer select-none border',
+        'size-9 sm:size-10 p-0 text-xs sm:text-sm font-semibold rounded-xl',
         isActive
-          ? 'bg-emerald-700 text-white border-emerald-700 shadow-xs'
+          ? 'bg-emerald-700 hover:bg-emerald-800 text-white border-emerald-700 shadow-xs'
           : 'bg-white text-slate-700 border-slate-200/80 hover:bg-slate-100 hover:text-slate-900',
         className
       )}
@@ -64,18 +67,20 @@ function PaginationPrevious({
   ...props
 }: React.ComponentProps<typeof PaginationLink>) {
   return (
-    <button
+    <Button
       aria-label="Go to previous page"
+      variant="outline"
+      size="sm"
       disabled={disabled}
       className={cn(
-        'inline-flex h-9 sm:h-10 items-center gap-1.5 rounded-xl border border-slate-200/80 bg-white px-3 sm:px-4 text-xs sm:text-sm font-semibold text-slate-700 transition-all duration-200 hover:bg-slate-100 hover:text-slate-900 cursor-pointer select-none disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-white',
+        'h-9 sm:h-10 gap-1.5 rounded-xl border border-slate-200/80 bg-white px-3 sm:px-4 text-xs sm:text-sm font-semibold text-slate-700 hover:bg-slate-100 hover:text-slate-900 disabled:opacity-40',
         className
       )}
       {...props}
     >
       <ChevronLeft className="size-4" />
       <span className="hidden sm:inline">Sebelumnya</span>
-    </button>
+    </Button>
   );
 }
 
@@ -85,18 +90,20 @@ function PaginationNext({
   ...props
 }: React.ComponentProps<typeof PaginationLink>) {
   return (
-    <button
+    <Button
       aria-label="Go to next page"
+      variant="outline"
+      size="sm"
       disabled={disabled}
       className={cn(
-        'inline-flex h-9 sm:h-10 items-center gap-1.5 rounded-xl border border-slate-200/80 bg-white px-3 sm:px-4 text-xs sm:text-sm font-semibold text-slate-700 transition-all duration-200 hover:bg-slate-100 hover:text-slate-900 cursor-pointer select-none disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-white',
+        'h-9 sm:h-10 gap-1.5 rounded-xl border border-slate-200/80 bg-white px-3 sm:px-4 text-xs sm:text-sm font-semibold text-slate-700 hover:bg-slate-100 hover:text-slate-900 disabled:opacity-40',
         className
       )}
       {...props}
     >
       <span className="hidden sm:inline">Selanjutnya</span>
       <ChevronRight className="size-4" />
-    </button>
+    </Button>
   );
 }
 

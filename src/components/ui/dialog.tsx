@@ -4,6 +4,10 @@ import * as React from 'react';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+import { useEscapeKey, useBodyScrollLock } from '@/hooks';
+
+import { Button } from '@/components/ui/button';
+
 export interface DialogProps {
   isOpen: boolean;
   onClose: () => void;
@@ -14,19 +18,9 @@ export interface DialogProps {
 }
 
 export function Dialog({ isOpen, onClose, title, hideHeader = false, children, className }: DialogProps) {
-  React.useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-      window.addEventListener('keydown', handleKeyDown);
-    }
-    return () => {
-      document.body.style.overflow = 'unset';
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [isOpen, onClose]);
+  useEscapeKey(onClose, isOpen);
+  useBodyScrollLock(isOpen);
+
 
   if (!isOpen) return null;
 
@@ -51,13 +45,16 @@ export function Dialog({ isOpen, onClose, title, hideHeader = false, children, c
             ) : (
               <div />
             )}
-            <button
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
               onClick={onClose}
-              className="rounded-full p-2 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors cursor-pointer"
+              className="size-9 rounded-full text-slate-500 hover:bg-slate-100 hover:text-slate-900"
               aria-label="Tutup Dialog"
             >
-              <X className="h-5 w-5" />
-            </button>
+              <X className="size-5" />
+            </Button>
           </div>
         )}
         {children}
