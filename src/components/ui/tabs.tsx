@@ -109,13 +109,15 @@ export function TabsTrigger({
   icon,
   className,
   children,
+  onClick,
   ...props
 }: TabsTriggerProps) {
   const { value, onValueChange, variant } = useTabs();
   const isActive = value === triggerValue;
 
-  const handleClick = () => {
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     onValueChange(triggerValue);
+    onClick?.(e);
   };
 
   if (variant === 'pill') {
@@ -126,18 +128,20 @@ export function TabsTrigger({
         aria-selected={isActive}
         onClick={handleClick}
         className={cn(
-          'inline-flex items-center gap-2 px-4 py-2 text-xs font-bold uppercase tracking-wider transition-all duration-200 cursor-pointer rounded-full select-none shrink-0',
+          'inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold uppercase tracking-wider transition-colors duration-150 cursor-pointer rounded-full select-none shrink-0 border border-transparent touch-manipulation [-webkit-tap-highlight-color:transparent] outline-none focus-visible:ring-2 focus-visible:ring-emerald-700/50',
           isActive
             ? 'bg-emerald-700 text-white shadow-md'
-            : 'text-slate-600 hover:text-emerald-800 bg-slate-100/90 hover:bg-slate-200/80 border border-slate-200/60',
+            : 'text-slate-600 hover:text-emerald-800 bg-slate-100/90 hover:bg-slate-200/80 border-slate-200/60',
           className
         )}
         {...props}
       >
         {icon && (
-          <span className={isActive ? 'text-emerald-200' : 'text-slate-400'}>{icon}</span>
+          <span className={cn('transition-colors shrink-0', isActive ? 'text-emerald-200' : 'text-slate-400')}>
+            {icon}
+          </span>
         )}
-        {children}
+        <span>{children}</span>
       </button>
     );
   }
@@ -149,10 +153,10 @@ export function TabsTrigger({
       aria-selected={isActive}
       onClick={handleClick}
       className={cn(
-        'flex items-center justify-center gap-2 py-3 sm:py-2.5 lg:py-3 px-4 sm:px-4 lg:px-6 text-sm font-medium transition-all duration-200 cursor-pointer rounded-xl text-center w-full',
+        'flex items-center justify-center gap-2 py-3 sm:py-2.5 lg:py-3 px-4 sm:px-4 lg:px-6 text-sm font-semibold transition-[color,background-color,border-color,box-shadow] duration-150 cursor-pointer rounded-xl text-center w-full select-none border touch-manipulation [-webkit-tap-highlight-color:transparent] outline-none focus-visible:ring-2 focus-visible:ring-emerald-700/50',
         isActive
-          ? 'bg-white text-slate-900 font-bold shadow-xs border border-slate-200/90 ring-1 ring-black/5'
-          : 'text-slate-600 hover:text-slate-900 hover:bg-white/60',
+          ? 'bg-white text-slate-900 border-slate-200/90 shadow-xs ring-1 ring-black/5'
+          : 'text-slate-600 hover:text-slate-900 hover:bg-white/60 border-transparent',
         className
       )}
       {...props}
@@ -160,7 +164,7 @@ export function TabsTrigger({
       {icon && (
         <span
           className={cn(
-            'shrink-0 transition-colors',
+            'shrink-0 transition-colors duration-150',
             isActive ? 'text-emerald-700' : 'text-slate-400'
           )}
         >
@@ -185,10 +189,13 @@ export function TabsContent({ value: contentValue, className, children, ...props
   return (
     <div
       role="tabpanel"
-      className={cn('animate-in fade-in duration-200', className)}
+      tabIndex={0}
+      className={cn('transition-opacity duration-200 focus-visible:outline-none', className)}
       {...props}
     >
       {children}
     </div>
   );
 }
+
+
