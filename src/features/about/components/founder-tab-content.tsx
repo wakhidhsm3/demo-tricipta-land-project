@@ -1,7 +1,8 @@
 import React from 'react';
 import Image from 'next/image';
 import { Quote, GraduationCap, CheckCircle2, Award } from 'lucide-react';
-import { Founder } from '@/lib/types/founder';
+import { Founder } from '@/lib/types/company.type';
+import { SectionEyebrow } from '@/components/shared';
 
 export interface FounderTabContentProps {
   founderData: Founder;
@@ -36,9 +37,9 @@ export function FounderTabContent({ founderData }: FounderTabContentProps) {
 
         <div className="lg:col-span-7 flex flex-col gap-5">
           <div>
-            <span className="font-serif italic font-semibold text-emerald-800 text-sm tracking-wide underline underline-offset-6">
+            <SectionEyebrow>
               Visi Kepemimpinan
-            </span>
+            </SectionEyebrow>
             <h2 className="font-serif text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 tracking-tight mt-2">
               {founderData.role}
             </h2>
@@ -64,9 +65,9 @@ export function FounderTabContent({ founderData }: FounderTabContentProps) {
         {/* Milestones Timeline */}
         <div className="lg:col-span-7 flex flex-col gap-6">
           <div>
-            <span className="font-serif italic font-semibold text-emerald-800 text-sm tracking-wide underline underline-offset-6">
+            <SectionEyebrow>
               Dedikasi & Karya
-            </span>
+            </SectionEyebrow>
             <h3 className="font-serif text-2xl font-bold text-slate-900 tracking-tight mt-1">
               Rekam Jejak & Milestone
             </h3>

@@ -4,8 +4,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import {
-  ChevronRight,
-  Home,
   Briefcase,
   GraduationCap,
   Award,
@@ -15,35 +13,55 @@ import {
   Building2,
   Calendar,
 } from 'lucide-react';
-import { getOrgMemberById, getAllOrgMembers } from '@/lib/data/organization';
-import { companyProfileData } from '@/lib/data/companyProfile';
+
+import { Breadcrumbs, SectionContainer, SectionEyebrow } from '@/components/shared';
+import {
+  getOrgMemberById,
+  getAllOrgMemberIds,
+} from '@/features/about';
+import { buildPersonJsonLd } from '@/lib/seo/jsonld';
+import { SafeJsonLd } from '@/lib/seo/safe-jsonld';
+import { siteConfig } from '@/lib/config/site.config';
+
+// Next.js App Router segment config requires statically analyzable literal
+export const revalidate = 3600;
 
 interface TeamMemberDetailPageProps {
   params: Promise<{ id: string }>;
 }
 
 export async function generateStaticParams() {
-  const members = getAllOrgMembers();
-  return members.map((member) => ({ id: member.id }));
+  const ids = await getAllOrgMemberIds();
+  return ids.map((id) => ({ id }));
 }
+
 
 export async function generateMetadata({
   params,
 }: TeamMemberDetailPageProps): Promise<Metadata> {
   const { id } = await params;
-  const member = getOrgMemberById(id);
+  const member = await getOrgMemberById(id);
 
   if (!member) {
-    return { title: 'Profil Tim Tidak Ditemukan — TRICIPTA LAND' };
+    return {
+      title: `Profil Tidak Ditemukan — ${siteConfig.name}`,
+    };
   }
 
   return {
-    title: `${member.name} — ${member.position} | TRICIPTA LAND`,
-    description: member.roleDescription,
+    title: `${member.name} — ${member.position} | ${siteConfig.name}`,
+    description: `Profil profesional ${member.name}, menjabat sebagai ${member.position} di ${siteConfig.name}. ${member.roleDescription}`,
     openGraph: {
       title: `${member.name} — ${member.position}`,
       description: member.roleDescription,
-      images: [member.photoUrl],
+      images: [
+        {
+          url: member.photoUrl,
+          width: 800,
+          height: 1000,
+          alt: member.name,
+        },
+      ],
     },
   };
 }
@@ -52,71 +70,32 @@ export default async function TeamMemberDetailPage({
   params,
 }: TeamMemberDetailPageProps) {
   const { id } = await params;
-  const member = getOrgMemberById(id);
+  const member = await getOrgMemberById(id);
+
 
   if (!member) {
     notFound();
   }
 
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'Person',
-    name: member.name,
-    jobTitle: member.position,
-    worksFor: {
-      '@type': 'Organization',
-      name: companyProfileData.legalName,
-    },
-    image: member.photoUrl,
-    description: member.roleDescription,
-  };
+  const jsonLd = buildPersonJsonLd(member);
+
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <SafeJsonLd data={jsonLd} />
 
       {/* Sticky Breadcrumb Bar */}
-      <div className="sticky top-16 z-40 w-full bg-white/95 backdrop-blur-md border-b border-dashed border-slate-200 shadow-2xs">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-3 min-[1280px]:border-x min-[1280px]:border-dashed min-[1280px]:border-slate-200">
-          <nav
-            aria-label="Breadcrumb"
-            className="flex items-center gap-1.5 text-xs text-slate-500 flex-wrap"
-          >
-            <Link
-              href="/"
-              className="inline-flex items-center gap-1 hover:text-emerald-800 transition-colors font-medium"
-            >
-              <Home className="size-3.5 text-slate-400" />
-              <span>Beranda</span>
-            </Link>
-            <ChevronRight className="size-3.5 text-slate-300" />
-            <Link
-              href="/about"
-              className="hover:text-emerald-800 transition-colors font-medium"
-            >
-              Tentang Kami
-            </Link>
-            <ChevronRight className="size-3.5 text-slate-300" />
-            <Link
-              href="/about?tab=organization"
-              className="hover:text-emerald-800 transition-colors font-medium"
-            >
-              Struktur Organisasi
-            </Link>
-            <ChevronRight className="size-3.5 text-slate-300" />
-            <span className="text-slate-900 font-semibold truncate max-w-xs sm:max-w-md">
-              {member.name}
-            </span>
-          </nav>
-        </div>
-      </div>
+      <Breadcrumbs
+        items={[
+          { label: 'Tentang Kami', href: '/about?tab=organization' },
+          { label: 'Struktur Organisasi', href: '/about?tab=organization' },
+          { label: member.name },
+        ]}
+      />
 
       {/* Main Profile Section */}
       <section className="w-full bg-white border-b border-dashed border-slate-200">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10 sm:py-16 min-[1280px]:border-x min-[1280px]:border-dashed min-[1280px]:border-slate-200">
+        <SectionContainer className="py-10 sm:py-16">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
             {/* Left Column: Photo Portrait & Key Facts */}
             <div className="lg:col-span-5 flex flex-col gap-6">
@@ -182,14 +161,14 @@ export default async function TeamMemberDetailPage({
             <div className="lg:col-span-7 flex flex-col gap-8">
               {/* Header Title */}
               <div className="space-y-3">
-                <span className="font-serif italic font-semibold text-emerald-800 text-sm tracking-wide underline underline-offset-6">
+                <SectionEyebrow>
                   Profil Kepemimpinan & Pengelola
-                </span>
+                </SectionEyebrow>
                 <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-slate-900 leading-tight">
                   {member.name}
                 </h1>
                 <p className="text-base sm:text-lg font-medium text-emerald-800">
-                  {member.position} — TRICIPTA LAND
+                  {member.position} — {siteConfig.name}
                 </p>
               </div>
 
@@ -260,7 +239,7 @@ export default async function TeamMemberDetailPage({
               </div>
             </div>
           </div>
-        </div>
+        </SectionContainer>
       </section>
     </>
   );
