@@ -1,0 +1,95 @@
+@import "tailwindcss";
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  :root {
+    --background: #FBFBF9;
+    --foreground: #111812;
+    
+    --brand-forest-dark: #0A220C;
+    --brand-forest: #144217;
+    --brand-emerald: #1F5C24;
+    --brand-sage: #E2EBE2;
+    --brand-gold: #D5A31F;
+    
+    --card: #FFFFFF;
+    --card-foreground: #111812;
+    
+    --border: #E5E7EB;
+    --input: #E5E7EB;
+    --ring: #144217;
+    --muted: #F3F4F1;
+    --muted-foreground: #64748B;
+  }
+}
+
+@theme {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-brand-forest-dark: var(--brand-forest-dark);
+  --color-brand-forest: var(--brand-forest);
+  --color-brand-emerald: var(--brand-emerald);
+  --color-brand-sage: var(--brand-sage);
+  --color-brand-gold: var(--brand-gold);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
+  --font-serif: var(--font-cormorant), Georgia, serif;
+  --font-sans: var(--font-manrope), system-ui, sans-serif;
+
+  --animate-marquee: marquee 30s linear infinite;
+  --animate-marquee-reverse: marquee-reverse 30s linear infinite;
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+@keyframes marquee-reverse {
+  from { transform: translateX(-50%); }
+  to   { transform: translateX(0); }
+}
+
+@property --border-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes border-rotate {
+  to { --border-angle: 360deg; }
+}
+
+.animated-pill-border {
+  background: conic-gradient(from var(--border-angle), #e2e8f0 0%, #e2e8f0 60%, #22c55e 72%, #4ade80 80%, #22c55e 88%, #e2e8f0 100%);
+  animation: border-rotate 2.5s linear infinite;
+}
+
+.hover-card-lift {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+}
+.hover-card-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 32px -8px rgba(15, 23, 42, 0.08), 0 4px 12px -2px rgba(15, 23, 42, 0.04);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #F1F3F0;
+}
+::-webkit-scrollbar-thumb {
+  background: #C4CDC4;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #144217;
+}
