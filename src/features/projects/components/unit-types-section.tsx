@@ -2,9 +2,11 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
+
 import { Bed, Bath, Car, Maximize, CheckCircle2, Home } from 'lucide-react';
-import { Tabs } from '@/components/ui/tabs';
-import { ProjectUnitType } from '@/lib/types/project';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { SectionHeader, SectionContainer } from '@/components/shared';
+import { ProjectUnitType } from '../types/project.type';
 
 export interface UnitTypesSectionProps {
   unitTypes: ProjectUnitType[];
@@ -15,38 +17,40 @@ export function UnitTypesSection({ unitTypes }: UnitTypesSectionProps) {
 
   const activeUnit = unitTypes.find((u) => u.id === activeUnitId) || unitTypes[0];
 
-  const tabItems = unitTypes.map((u) => ({
-    id: u.id,
-    label: u.name,
-    icon: <Home className="size-4" />,
-  }));
-
   if (!activeUnit) return null;
 
   return (
     <section className="w-full bg-slate-50/40 border-b border-dashed border-slate-200">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16 min-[1280px]:border-x min-[1280px]:border-dashed min-[1280px]:border-slate-200">
-        <div className="flex flex-col items-center gap-2 text-center mb-8">
-          <span className="font-serif italic font-semibold text-emerald-800 text-sm tracking-wide underline underline-offset-6">
-            Pilihan Desain Denah
-          </span>
-          <h2 className="font-serif text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
-            Pilihan Tipe Unit Rumahan
-          </h2>
-          <p className="text-xs sm:text-sm text-slate-500 max-w-xl">
-            Pilih tipe rumah di bawah ini untuk melihat denah lantai (*floor plan*), luas area, dan fitur unggulan.
-          </p>
-        </div>
+      <SectionContainer className="py-12 sm:py-16">
+        <SectionHeader
+          badgeText="Pilihan Desain Denah"
+          title="Pilihan Tipe Unit Rumahan"
+          description="Pilih tipe rumah di bawah ini untuk melihat denah lantai (floor plan), luas area, dan fitur unggulan."
+          borderBottom={false}
+          className="pt-0 sm:pt-0 pb-6 sm:pb-8 px-0 sm:px-0"
+        />
+
 
         {/* Tab Selection */}
         <div className="mb-8">
           <Tabs
-            tabs={tabItems}
-            activeTab={activeUnitId}
-            onChange={setActiveUnitId}
+            value={activeUnitId}
+            onValueChange={setActiveUnitId}
             variant="segmented"
             className="w-full max-w-2xl mx-auto"
-          />
+          >
+            <TabsList className="w-full">
+              {unitTypes.map((unit) => (
+                <TabsTrigger
+                  key={unit.id}
+                  value={unit.id}
+                  icon={<Home className="size-4" />}
+                >
+                  {unit.name}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
         </div>
 
         {/* Active Unit Card Container */}
@@ -57,6 +61,7 @@ export function UnitTypesSection({ unitTypes }: UnitTypesSectionProps) {
               src={activeUnit.floorPlanUrl}
               alt={activeUnit.name}
               fill
+              quality={85}
               sizes="(max-width: 1024px) 100vw, 50vw"
               className="object-cover"
             />
@@ -120,7 +125,7 @@ export function UnitTypesSection({ unitTypes }: UnitTypesSectionProps) {
             </div>
           </div>
         </div>
-      </div>
+      </SectionContainer>
     </section>
   );
 }

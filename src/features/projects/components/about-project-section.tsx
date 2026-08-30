@@ -1,7 +1,7 @@
 import React from 'react';
 import { ShieldCheck, Check, FileText, Download, Sparkles, Building2, Trees, Compass } from 'lucide-react';
-import { Project } from '@/lib/types/project';
-import { AnimateIn } from '@/components/shared/AnimateIn';
+import { Project, PROJECT_CATEGORY_OPTIONS } from '../types/project.type';
+import { SectionHeader, SectionContainer } from '@/components/shared';
 
 export interface AboutProjectSectionProps {
   project: Project;
@@ -10,21 +10,17 @@ export interface AboutProjectSectionProps {
 export function AboutProjectSection({ project }: AboutProjectSectionProps) {
   return (
     <section id="tentang-proyek" className="w-full bg-white border-b border-dashed border-slate-200">
-      <div className="mx-auto max-w-7xl min-[1280px]:border-x min-[1280px]:border-dashed min-[1280px]:border-slate-200">
+      <SectionContainer noPadding>
         {/* Section Header */}
-        <AnimateIn variant="fade-up" durationMs={500}>
-          <div className="px-4 sm:px-6 lg:px-8 pt-14 sm:pt-18 pb-8 sm:pb-10 text-center flex flex-col items-center gap-3 border-b border-dashed border-slate-200">
-            <span className="font-serif italic font-semibold text-emerald-800 text-sm sm:text-base tracking-wide underline underline-offset-6">
-              Tentang Kawasan Hunian
-            </span>
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold font-serif text-slate-900 tracking-tight max-w-3xl">
+        <SectionHeader
+          badgeText="Tentang Kawasan Hunian"
+          title={
+            <>
               Konsep & Keunggulan <span className="text-emerald-800">{project.name}</span>
-            </h2>
-            <p className="text-slate-600 text-base sm:text-lg max-w-2xl leading-relaxed">
-              {project.tagline}
-            </p>
-          </div>
-        </AnimateIn>
+            </>
+          }
+          description={project.tagline}
+        />
 
         {/* Main Content: 2-Column Split Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-12 divide-y lg:divide-y-0 lg:divide-x divide-dashed divide-slate-200">
@@ -80,11 +76,7 @@ export function AboutProjectSection({ project }: AboutProjectSectionProps) {
                     Kategori Hunian
                   </span>
                   <span className="font-bold text-slate-900">
-                    {project.category === 'KOMERSIL'
-                      ? 'Komersil Modern'
-                      : project.category === 'SUBSIDI'
-                      ? 'Subsidi FLPP Pemerintah'
-                      : 'Klaster Tropical Villa'}
+                    {PROJECT_CATEGORY_OPTIONS.find((c) => c.value === project.category)?.label || project.category}
                   </span>
                 </div>
 
@@ -142,7 +134,7 @@ export function AboutProjectSection({ project }: AboutProjectSectionProps) {
             )}
           </div>
         </div>
-      </div>
+      </SectionContainer>
     </section>
   );
 }

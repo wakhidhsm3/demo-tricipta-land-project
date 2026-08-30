@@ -2,28 +2,20 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Bed, Bath, Maximize, ArrowUpRight, ShieldCheck, MapPin } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { Project } from '@/lib/types/project';
+import { Project, ProjectSummary } from '../types/project.type';
+import { ProjectStatusBadge, ProjectCategoryBadge } from './project-badges';
 
 export interface ProjectCardProps {
-  project: Project;
+  project: Project | ProjectSummary;
 }
 
-const CATEGORY_LABELS: Record<string, string> = {
-  KOMERSIL: 'Komersil',
-  SUBSIDI: 'Subsidi FLPP',
-  CLUSTERNATURAL: 'Klaster Natural',
-};
-
 export function ProjectCard({ project }: ProjectCardProps) {
-  const primaryUnit = project.unitTypes[0];
-
-  const statusLabel =
-    project.status === 'DIJUAL'
-      ? 'Dijual'
-      : project.status === 'SEGERA_HADIR'
-      ? 'Segera Hadir'
-      : 'Habis Terjual';
+  const primaryUnit =
+    'primaryUnit' in project
+      ? project.primaryUnit
+      : 'unitTypes' in project
+      ? (project as Project).unitTypes[0]
+      : undefined;
 
   return (
     <Link
@@ -62,26 +54,14 @@ export function ProjectCard({ project }: ProjectCardProps) {
           />
           <div className="absolute inset-0 bg-linear-to-t from-slate-950/75 via-slate-950/20 to-transparent" />
 
-          {/* Floating Badges */}
-          <div className="absolute top-3 inset-x-3 flex items-center justify-between gap-2 z-10">
-            <div className="flex items-center gap-1.5 min-w-0">
-              <span
-                className={`h-6.5 px-2.5 rounded-full text-[11px] font-bold whitespace-nowrap inline-flex items-center shadow-xs ${
-                  project.status === 'DIJUAL'
-                    ? 'bg-emerald-700 text-white'
-                    : project.status === 'SEGERA_HADIR'
-                    ? 'bg-amber-500 text-slate-950 font-extrabold'
-                    : 'bg-slate-700/90 text-slate-200'
-                }`}
-              >
-                {statusLabel}
-              </span>
-              <span className="h-6.5 px-2.5 rounded-full text-[11px] font-semibold whitespace-nowrap inline-flex items-center bg-white/95 backdrop-blur-md text-slate-800 border border-slate-200/80 shadow-xs">
-                {CATEGORY_LABELS[project.category] || project.category}
-              </span>
+          {/* Floating Badges (Equal h-6 height, zero text wrapping, glassmorphic styling) */}
+          <div className="absolute top-3 inset-x-3 flex items-center justify-between gap-1.5 z-10">
+            <div className="flex items-center gap-1.5 overflow-hidden">
+              <ProjectStatusBadge status={project.status} />
+              <ProjectCategoryBadge category={project.category} />
             </div>
 
-            <span className="h-6.5 px-2.5 rounded-full text-[10px] font-bold whitespace-nowrap inline-flex items-center gap-1 bg-slate-950/75 backdrop-blur-md text-emerald-300 border border-emerald-500/30 shadow-xs shrink-0">
+            <span className="h-6 px-2.5 rounded-full text-[10.5px] font-bold whitespace-nowrap inline-flex items-center gap-1 bg-slate-950/75 backdrop-blur-md text-emerald-300 border border-emerald-500/30 shadow-2xs shrink-0">
               <ShieldCheck className="size-3 text-emerald-400" />
               <span>SHM & PBG</span>
             </span>

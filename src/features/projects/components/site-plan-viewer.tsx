@@ -1,9 +1,12 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import Image from 'next/image';
 import { Maximize2, Map } from 'lucide-react';
 import { Dialog } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { SectionContainer, SectionEyebrow } from '@/components/shared';
+import { useDisclosure } from '@/hooks';
 
 export interface SitePlanViewerProps {
   sitePlanUrl: string;
@@ -11,16 +14,23 @@ export interface SitePlanViewerProps {
 }
 
 export function SitePlanViewer({ sitePlanUrl, projectName }: SitePlanViewerProps) {
-  const [isOpen, setIsOpen] = useState(false);
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      onOpen();
+    }
+  };
 
   return (
     <section className="w-full bg-slate-50/40 border-b border-dashed border-slate-200">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16 min-[1280px]:border-x min-[1280px]:border-dashed min-[1280px]:border-slate-200">
+      <SectionContainer className="py-12 sm:py-16">
         <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-4 mb-8">
           <div>
-            <span className="font-serif italic font-semibold text-emerald-800 text-sm tracking-wide underline underline-offset-6">
+            <SectionEyebrow>
               Tata Ruang & Kavling
-            </span>
+            </SectionEyebrow>
             <h2 className="font-serif text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight mt-1">
               Site Plan & Master Plan Kawasan
             </h2>
@@ -29,23 +39,30 @@ export function SitePlanViewer({ sitePlanUrl, projectName }: SitePlanViewerProps
             </p>
           </div>
 
-          <button
-            onClick={() => setIsOpen(true)}
-            className="inline-flex items-center gap-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 px-4 py-2.5 text-xs sm:text-sm font-semibold text-white shadow-xs transition-colors cursor-pointer shrink-0"
+          <Button
+            variant="default"
+            size="md"
+            onClick={onOpen}
+            className="shrink-0"
           >
             <Maximize2 className="size-4" />
             <span>Perbesar Master Plan</span>
-          </button>
+          </Button>
         </div>
 
         <div
-          onClick={() => setIsOpen(true)}
-          className="relative h-80 sm:h-110 w-full rounded-2xl overflow-hidden border border-slate-200/90 bg-slate-100 group cursor-pointer shadow-xs hover:border-emerald-300 transition-all duration-300"
+          role="button"
+          tabIndex={0}
+          onClick={onOpen}
+          onKeyDown={handleKeyDown}
+          aria-label={`Perbesar Master Plan ${projectName}`}
+          className="relative h-80 sm:h-110 w-full rounded-2xl overflow-hidden border border-slate-200/90 bg-slate-100 group cursor-pointer shadow-xs hover:border-emerald-300 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-emerald-700 focus-visible:ring-offset-2 transition-all duration-300"
         >
           <Image
             src={sitePlanUrl}
             alt={`Site Plan ${projectName}`}
             fill
+            quality={85}
             sizes="(max-width: 1024px) 100vw, 1200px"
             className="object-cover transition-transform duration-500 group-hover:scale-105"
           />
@@ -55,9 +72,9 @@ export function SitePlanViewer({ sitePlanUrl, projectName }: SitePlanViewerProps
             </span>
           </div>
         </div>
-      </div>
+      </SectionContainer>
 
-      <Dialog isOpen={isOpen} onClose={() => setIsOpen(false)} className="max-w-5xl bg-black/95 text-white p-3 rounded-2xl border border-white/20">
+      <Dialog isOpen={isOpen} onClose={onClose} className="max-w-5xl bg-black/95 text-white p-3 rounded-2xl border border-white/20">
         <div className="relative h-[75vh] w-full">
           <Image src={sitePlanUrl} alt={`Site Plan Full ${projectName}`} fill sizes="100vw" className="object-contain" />
         </div>
