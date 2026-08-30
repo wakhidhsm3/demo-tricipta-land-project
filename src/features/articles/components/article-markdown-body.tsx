@@ -26,40 +26,44 @@ function renderFormattedText(text: string): React.ReactNode {
   });
 }
 
-export function ArticleMarkdownBody({ content }: ArticleMarkdownBodyProps) {
-  // Split raw markdown into logical blocks by double newlines or lines
-  const rawBlocks = content
+type MarkdownBlock =
+  | { type: 'h2'; content: string }
+  | { type: 'h3'; content: string }
+  | { type: 'quote'; content: string }
+  | { type: 'list'; content: string[] }
+  | { type: 'paragraph'; content: string };
+
+function parseMarkdownToBlocks(rawContent: string): MarkdownBlock[] {
+  const rawBlocks = rawContent
     .split('\n\n')
     .map((b) => b.trim())
     .filter(Boolean);
 
-  // Flatten blocks into logical elements (headings, paragraphs, lists, quotes)
-  const blocks: { type: 'h2' | 'h3' | 'quote' | 'list' | 'paragraph'; content: string | string[] }[] = [];
+  const blocks: MarkdownBlock[] = [];
 
-  rawBlocks.forEach((block) => {
+  for (const block of rawBlocks) {
     const lines = block.split('\n').map((l) => l.trim()).filter(Boolean);
-
     let currentList: string[] = [];
 
-    lines.forEach((line) => {
+    for (const line of lines) {
       if (line.startsWith('## ')) {
         if (currentList.length > 0) {
           blocks.push({ type: 'list', content: currentList });
           currentList = [];
         }
-        blocks.push({ type: 'h2', content: line.replace('## ', '').trim() });
+        blocks.push({ type: 'h2', content: line.slice(3).trim() });
       } else if (line.startsWith('### ')) {
         if (currentList.length > 0) {
           blocks.push({ type: 'list', content: currentList });
           currentList = [];
         }
-        blocks.push({ type: 'h3', content: line.replace('### ', '').trim() });
+        blocks.push({ type: 'h3', content: line.slice(4).trim() });
       } else if (line.startsWith('> ')) {
         if (currentList.length > 0) {
           blocks.push({ type: 'list', content: currentList });
           currentList = [];
         }
-        blocks.push({ type: 'quote', content: line.replace('> ', '').trim() });
+        blocks.push({ type: 'quote', content: line.slice(2).trim() });
       } else if (line.startsWith('- ') || line.startsWith('* ')) {
         currentList.push(line.replace(/^[-*]\s*/, '').trim());
       } else {
@@ -69,12 +73,18 @@ export function ArticleMarkdownBody({ content }: ArticleMarkdownBodyProps) {
         }
         blocks.push({ type: 'paragraph', content: line });
       }
-    });
+    }
 
     if (currentList.length > 0) {
       blocks.push({ type: 'list', content: currentList });
     }
-  });
+  }
+
+  return blocks;
+}
+
+export function ArticleMarkdownBody({ content }: ArticleMarkdownBodyProps) {
+  const blocks = parseMarkdownToBlocks(content);
 
   return (
     <div className="flex flex-col gap-4 text-base sm:text-lg text-slate-700 font-sans leading-relaxed">

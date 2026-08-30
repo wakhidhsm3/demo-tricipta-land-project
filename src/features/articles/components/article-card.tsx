@@ -4,20 +4,15 @@ import Link from 'next/link';
 import { Calendar, ArrowUpRight, Clock } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { formatDate } from '@/lib/utils';
-import { Article } from '@/lib/types/article';
+import { Article, ArticleSummary, ARTICLE_CATEGORY_LABEL_MAP } from '../types/article.type';
 
 export interface ArticleCardProps {
-  article: Article;
+  article: Article | ArticleSummary;
 }
 
 export function ArticleCard({ article }: ArticleCardProps) {
-  const categoryLabels: Record<string, string> = {
-    TIPS_HUNIAN: 'Tips Hunian',
-    INVESTASI: 'Investasi Properti',
-    PROGRES_PROYEK: 'Progres Proyek',
-  };
+  const categoryDisplay = ARTICLE_CATEGORY_LABEL_MAP[article.category] || article.category;
 
-  const categoryDisplay = categoryLabels[article.category] || article.category;
 
   return (
     <Link

@@ -1,8 +1,8 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Calendar, Clock, ArrowRight, BookOpen } from 'lucide-react';
-import { articlesData } from '@/lib/data/articles';
+import { Calendar, ArrowRight, BookOpen } from 'lucide-react';
+import { articleRepository } from '../repositories/article.repository';
 import { formatDate } from '@/lib/utils';
 
 export interface RelatedArticlesSectionProps {
@@ -10,16 +10,9 @@ export interface RelatedArticlesSectionProps {
   category: string;
 }
 
-export function RelatedArticlesSection({ currentArticleId, category }: RelatedArticlesSectionProps) {
-  const sameCategory = articlesData
-    .filter((a) => a.id !== currentArticleId && a.category === category)
-    .slice(0, 3);
+export async function RelatedArticlesSection({ currentArticleId, category }: RelatedArticlesSectionProps) {
+  const displayArticles = await articleRepository.getRelated(currentArticleId, category, 3);
 
-  const otherArticles = articlesData
-    .filter((a) => a.id !== currentArticleId && a.category !== category)
-    .slice(0, 3 - sameCategory.length);
-
-  const displayArticles = [...sameCategory, ...otherArticles].slice(0, 3);
 
   if (displayArticles.length === 0) return null;
 

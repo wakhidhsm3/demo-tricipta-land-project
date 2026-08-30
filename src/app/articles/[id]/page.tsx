@@ -2,29 +2,41 @@ import React from 'react';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { ArrowUpRight, MessageSquare } from 'lucide-react';
-import { ArticleDetailHero } from '@/features/articles/ArticleDetailHero';
-import { ArticleMarkdownBody } from '@/features/articles/ArticleMarkdownBody';
-import { RelatedArticlesSection } from '@/features/articles/RelatedArticlesSection';
-import { getArticleById, getArticles } from '@/lib/data/articles';
-import { companyProfileData } from '@/lib/data/companyProfile';
+import {
+  ArticleDetailHero,
+  ArticleMarkdownBody,
+  RelatedArticlesSection,
+  getArticleById,
+  getAllArticleIds,
+} from '@/features/articles';
+import { getCompanyProfile } from '@/features/about';
+import { SectionContainer } from '@/components/shared';
+import { createWhatsAppUrl, buildArticleInquiryMessage } from '@/lib/whatsapp';
+import { buildArticleJsonLd } from '@/lib/seo/jsonld';
+import { SafeJsonLd } from '@/lib/seo/safe-jsonld';
+import { siteConfig } from '@/lib/config/site.config';
+
+// Next.js App Router segment config requires statically analyzable literal
+export const revalidate = 3600;
 
 interface ArticleDetailProps {
   params: Promise<{ id: string }>;
 }
 
 export async function generateStaticParams() {
-  const articles = await getArticles();
-  return articles.map((article) => ({ id: article.id }));
+  const ids = await getAllArticleIds();
+  return ids.map((id) => ({ id }));
 }
+
 
 export async function generateMetadata({ params }: ArticleDetailProps): Promise<Metadata> {
   const { id } = await params;
   const article = await getArticleById(id);
 
-  if (!article) return { title: 'Artikel Tidak Ditemukan — TRICIPTA LAND' };
+  if (!article) return { title: `Artikel Tidak Ditemukan — ${siteConfig.name}` };
 
   return {
-    title: `${article.title} — TRICIPTA LAND`,
+    title: `${article.title} — ${siteConfig.name}`,
     description: article.excerpt,
     openGraph: {
       title: article.title,
@@ -36,40 +48,32 @@ export async function generateMetadata({ params }: ArticleDetailProps): Promise<
 
 export default async function ArticleDetailPage({ params }: ArticleDetailProps) {
   const { id } = await params;
-  const article = await getArticleById(id);
+  const [article, companyProfile] = await Promise.all([
+    getArticleById(id),
+    getCompanyProfile(),
+  ]);
 
   if (!article) notFound();
 
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'Article',
-    headline: article.title,
-    description: article.excerpt,
-    image: article.coverImage.url,
-    datePublished: article.publishedAt,
-    author: {
-      '@type': 'Organization',
-      name: 'TRICIPTA LAND Editorial',
-    },
-  };
+  const jsonLd = buildArticleJsonLd(article);
 
-  const whatsappInquiryUrl = `https://wa.me/${companyProfileData.headOffice.whatsapp}?text=${encodeURIComponent(
-    `Halo TRICIPTA LAND, saya membaca artikel "${article.title}" dan ingin berkonsultasi seputar perumahan & KPR.`
-  )}`;
+  const whatsappInquiryUrl = createWhatsAppUrl({
+    phone: companyProfile.headOffice.whatsapp,
+    message: buildArticleInquiryMessage({ articleTitle: article.title }),
+  });
+
+
 
   return (
     <main className="w-full bg-white">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <SafeJsonLd data={jsonLd} />
 
       {/* Hero Section */}
       <ArticleDetailHero article={article} />
 
       {/* Main Content Area with Split 2-Column (Body on Left, Sticky Sidebar on Right) */}
       <section className="w-full bg-white border-b border-dashed border-slate-200">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16 min-[1280px]:border-x min-[1280px]:border-dashed min-[1280px]:border-slate-200">
+        <SectionContainer className="py-12 sm:py-16">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12">
             {/* Left Column (Main Article Content) */}
             <article className="lg:col-span-8 flex flex-col gap-6">
@@ -91,7 +95,7 @@ export default async function ArticleDetailPage({ params }: ArticleDetailProps) 
                     Cari Rumah Impian yang Sesuai Budget Anda?
                   </h4>
                   <p className="text-xs text-slate-600 mt-1 leading-relaxed">
-                    Tim konsultan TRICIPTA LAND siap membantu simulasi KPR subsidi/komersil dan pendampingan survey lokasi gratis.
+                    Tim konsultan {siteConfig.name} siap membantu simulasi KPR subsidi/komersil dan pendampingan survey lokasi gratis.
                   </p>
                 </div>
 
@@ -108,7 +112,7 @@ export default async function ArticleDetailPage({ params }: ArticleDetailProps) 
               </div>
             </aside>
           </div>
-        </div>
+        </SectionContainer>
       </section>
     </main>
   );

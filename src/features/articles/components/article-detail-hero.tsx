@@ -1,9 +1,9 @@
 import React from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
-import { Calendar, Clock, User, ChevronRight, Home } from 'lucide-react';
+import { Calendar, Clock, User } from 'lucide-react';
+import { Breadcrumbs, SectionContainer } from '@/components/shared';
 import { formatDate } from '@/lib/utils';
-import { Article } from '@/lib/types/article';
+import { Article } from '../types/article.type';
 
 export interface ArticleDetailHeroProps {
   article: Article;
@@ -13,28 +13,16 @@ export function ArticleDetailHero({ article }: ArticleDetailHeroProps) {
   return (
     <>
       {/* Sticky Breadcrumb Bar */}
-      <div className="sticky top-16 z-40 w-full bg-white/95 backdrop-blur-md border-b border-dashed border-slate-200 shadow-2xs">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-3 min-[1280px]:border-x min-[1280px]:border-dashed min-[1280px]:border-slate-200">
-          <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-xs text-slate-500 flex-wrap">
-            <Link href="/" className="inline-flex items-center gap-1 hover:text-emerald-700 transition-colors font-medium">
-              <Home className="size-3.5 text-slate-400" />
-              <span>Beranda</span>
-            </Link>
-            <ChevronRight className="size-3.5 text-slate-400" />
-            <Link href="/articles" className="hover:text-emerald-700 transition-colors font-medium">
-              Artikel & Edukasi
-            </Link>
-            <ChevronRight className="size-3.5 text-slate-400" />
-            <span className="text-slate-900 font-semibold truncate max-w-xs sm:max-w-md lg:max-w-xl">
-              {article.title}
-            </span>
-          </nav>
-        </div>
-      </div>
+      <Breadcrumbs
+        items={[
+          { label: 'Artikel & Edukasi', href: '/articles' },
+          { label: article.title },
+        ]}
+      />
 
       {/* Main Hero Header Section */}
       <section className="w-full bg-white border-b border-dashed border-slate-200">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-8 pb-10 sm:pb-12 min-[1280px]:border-x min-[1280px]:border-dashed min-[1280px]:border-slate-200">
+        <SectionContainer className="pt-8 pb-10 sm:pb-12">
 
         {/* Headline */}
         <div className="flex flex-col gap-4 max-w-4xl">
@@ -70,7 +58,7 @@ export function ArticleDetailHero({ article }: ArticleDetailHeroProps) {
             className="object-cover"
           />
         </div>
-      </div>
+      </SectionContainer>
     </section>
     </>
   );
