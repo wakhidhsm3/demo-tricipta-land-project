@@ -4,10 +4,9 @@
 [![React](https://img.shields.io/badge/React-19.2.8-61dafb?style=flat-square&logo=react)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-3178c6?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4-38bdf8?style=flat-square&logo=tailwindcss)](https://tailwindcss.com/)
-[![Runtime](https://img.shields.io/badge/Runtime-Bun%201.4-fbf0df?style=flat-square&logo=bun)](https://bun.sh/)
-[![License](https://img.shields.io/badge/License-Proprietary-emerald?style=flat-square)]()
+[![Demo](https://img.shields.io/badge/Type-Demo%20Project-amber?style=flat-square)]()
 
-Portal web resmi **PT TRICIPTA LAND INDONESIA** — Pengembang perumahan terpercaya dengan legalitas 100% aman (SHM telah terpecah per kavling), lingkungan asri, dan lokasi strategis di Jawa Barat. Aplikasi web enterprise berbasis **Next.js 16 App Router**, **React 19**, **TypeScript**, dan **Tailwind CSS v4**.
+Portal web percontohan (*demo project*) **TRICIPTA LAND** — Platform pengembang perumahan modern dengan legalitas aman, desain hunian asri, dan fitur simulasi KPR interaktif. Dibangun menggunakan **Next.js 16 App Router**, **React 19**, **TypeScript**, dan **Tailwind CSS v4**.
 
 ---
 
@@ -21,7 +20,6 @@ Portal web resmi **PT TRICIPTA LAND INDONESIA** — Pengembang perumahan terperc
 - [📜 Skrip Tersedia](#-skrip-tersedia)
 - [🛡️ Standar Kualitas Kode (Code Quality)](#️-standar-kualitas-kode-code-quality)
 - [📈 Optimasi SEO & Metadata](#-optimasi-seo--metadata)
-- [📄 Lisensi](#-lisensi)
 
 ---
 
@@ -200,8 +198,3 @@ Seluruh kontribusi kode pada proyek ini wajib mengikuti aturan standar di [`AGEN
 - **Rich Snippets JSON-LD**: Skema terstruktur `Organization`, `RealEstateAgent`, `SingleFamilyResidence`, `Article`, dan `BreadcrumbList` untuk memaksimalkan peringkat di mesin pencari Google.
 - **Peta Situs Otomatis**: Generator `sitemap.xml` dan `robots.txt` dinamis untuk pengindeksan halaman proyek dan artikel secara instan.
 
----
-
-## 📄 Lisensi
-
-Hak Cipta © 2026 **PT TRICIPTA LAND INDONESIA**. Seluruh hak cipta dilindungi undang-undang.
