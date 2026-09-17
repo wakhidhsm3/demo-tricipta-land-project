@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { Maximize2, Map } from 'lucide-react';
+import { Map, X } from 'lucide-react';
 import { Dialog } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { SectionContainer, SectionEyebrow } from '@/components/shared';
@@ -26,28 +26,16 @@ export function SitePlanViewer({ sitePlanUrl, projectName }: SitePlanViewerProps
   return (
     <section className="w-full bg-slate-50/40 border-b border-dashed border-slate-200">
       <SectionContainer className="py-12 sm:py-16">
-        <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-4 mb-8">
-          <div>
-            <SectionEyebrow>
-              Tata Ruang & Kavling
-            </SectionEyebrow>
-            <h2 className="font-serif text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight mt-1">
-              Site Plan & Master Plan Kawasan
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-500 mt-1">
-              Peta tata letak kavling, posisi fasos/fasum, dan jaringan row jalan di {projectName}.
-            </p>
-          </div>
-
-          <Button
-            variant="default"
-            size="md"
-            onClick={onOpen}
-            className="shrink-0"
-          >
-            <Maximize2 className="size-4" />
-            <span>Perbesar Master Plan</span>
-          </Button>
+        <div className="mb-8">
+          <SectionEyebrow>
+            Tata Ruang & Kavling
+          </SectionEyebrow>
+          <h2 className="font-serif text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight mt-1">
+            Site Plan & Master Plan Kawasan
+          </h2>
+          <p className="text-xs sm:text-sm text-slate-500 mt-1">
+            Peta tata letak kavling, posisi fasos/fasum, dan jaringan jalan di {projectName}.
+          </p>
         </div>
 
         <div
@@ -74,9 +62,52 @@ export function SitePlanViewer({ sitePlanUrl, projectName }: SitePlanViewerProps
         </div>
       </SectionContainer>
 
-      <Dialog isOpen={isOpen} onClose={onClose} className="max-w-5xl bg-black/95 text-white p-3 rounded-2xl border border-white/20">
-        <div className="relative h-[75vh] w-full">
-          <Image src={sitePlanUrl} alt={`Site Plan Full ${projectName}`} fill sizes="100vw" className="object-contain" />
+      {/* Fullscreen Modal Dialog with Clean White Theme */}
+      <Dialog
+        isOpen={isOpen}
+        onClose={onClose}
+        hideHeader
+        className="max-w-5xl w-full bg-white text-slate-900 p-4 sm:p-5 lg:p-6 rounded-3xl border border-slate-200 shadow-2xl overflow-hidden"
+      >
+        <div className="relative flex flex-col items-center justify-center w-full">
+          {/* Header info: counter/badge & title */}
+          <div className="w-full flex items-center justify-between border-b border-dashed border-slate-200 pb-3 mb-3.5">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <span className="text-xs font-bold text-emerald-800 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200/80 shrink-0">
+                Master Plan Kawasan
+              </span>
+              <span className="text-xs text-slate-600 font-medium truncate max-w-md hidden sm:inline">
+                {projectName} • Peta Blok & Fasilitas
+              </span>
+            </div>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={onClose}
+              className="size-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 shrink-0"
+              aria-label="Tutup Peta Master Plan"
+            >
+              <X className="size-4.5" />
+            </Button>
+          </div>
+
+          {/* Main high-res image view */}
+          <div className="relative h-[55vh] sm:h-[65vh] lg:h-[70vh] w-full rounded-2xl overflow-hidden bg-slate-100 border border-slate-200/80">
+            <Image
+              src={sitePlanUrl}
+              alt={`Site Plan Full ${projectName}`}
+              fill
+              sizes="100vw"
+              className="object-contain"
+              priority
+            />
+          </div>
+
+          {/* Bottom caption */}
+          <p className="mt-3.5 text-center text-xs sm:text-sm font-semibold text-slate-700">
+            Tata Letak Kavling, Fasilitas Umum & Row Jalan • {projectName}
+          </p>
         </div>
       </Dialog>
     </section>
